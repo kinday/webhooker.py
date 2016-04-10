@@ -1,5 +1,4 @@
-from .. import branch_affected, in_networks
-from netaddr import IPNetwork
+from .. import branch_affected
 import unittest
 
 
@@ -21,24 +20,6 @@ class TestWebhooker(unittest.TestCase):
             branch_affected(fixtures, 'feature/foo'),
             False,
             'should return False when branch is not affected',
-        )
-
-    def test_in_networks(self):
-        fixtures = [
-            # Allow localhost
-            IPNetwork('127.0.0.1/8'),
-        ]
-
-        self.assertEqual(
-            in_networks(fixtures, '127.0.0.1'),
-            True,
-            'should return True when IP is in networks',
-        )
-
-        self.assertEqual(
-            in_networks(fixtures, '192.168.1.1'),
-            False,
-            'should return False when IP is not in networks',
         )
 
 

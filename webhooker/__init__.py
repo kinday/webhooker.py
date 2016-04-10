@@ -1,7 +1,8 @@
+from .ip import in_networks
 from .utils import any_pass, path
 from functools import partial
 from netaddr import IPAddress, IPNetwork
-from operator import contains, eq
+from operator import eq
 from urlparse import parse_qs
 import json
 import subprocess
@@ -13,13 +14,6 @@ import web
 def branch_affected(changes, name):
     get_name = partial(path, ['new', 'name'])
     return any_pass(lambda change: eq(name, get_name(change)), changes)
-
-
-# in_networks :: ([IPNetwork] -> string) -> boolean
-# Returns true if specified IP matches any network
-def in_networks(networks, ip_str):
-    ip = IPAddress(ip_str)
-    return any_pass(lambda network: contains(network, ip), networks)
 
 
 # trigger_deployment :: string -> process
