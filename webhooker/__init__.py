@@ -1,16 +1,11 @@
+from .utils import any_pass, path
 from functools import partial
 from netaddr import IPAddress, IPNetwork
-from operator import contains, eq, or_
+from operator import contains, eq
 from urlparse import parse_qs
 import json
 import subprocess
 import web
-
-
-# any_pass :: (fn -> [*]) -> boolean
-# Returns True if any iterable item returns true when passed to fn
-def any_pass(fn, iterable):
-    return reduce(lambda passed, a: or_(passed, fn(a)), iterable, False)
 
 
 # branch_affected :: ([dict] -> string) -> boolean
@@ -25,16 +20,6 @@ def branch_affected(changes, name):
 def in_networks(networks, ip_str):
     ip = IPAddress(ip_str)
     return any_pass(lambda network: contains(network, ip), networks)
-
-
-# path :: ([string] -> dict) -> *
-# Gets deep value from dict
-def path(keys, dict_):
-    return reduce(
-        lambda v, k: v and isinstance(v, dict) and v.get(k) or None,
-        keys,
-        dict_
-    )
 
 
 # trigger_deployment :: string -> process
