@@ -1,7 +1,6 @@
-from .ip import in_networks
+from .ip import in_networks, to_networks
 from .utils import any_pass, path
 from functools import partial
-from netaddr import IPAddress, IPNetwork
 from operator import eq
 from urlparse import parse_qs
 import json
@@ -23,17 +22,18 @@ def trigger_deployment(path):
     return subprocess.Popen(cmd, cwd=path)
 
 
-# List of allowed IP addresses
-whitelist = [
+# List of allowed IP networks
+whitelist = to_networks([
     # Allow localhost
-    IPNetwork('127.0.0.1/8'),
+    '127.0.0.1/8',
 
     # Allow Bitbucket
-    IPNetwork('104.192.143.0/24'),
-    IPNetwork('131.103.20.160/27'),
-    IPNetwork('165.254.145.0/26'),
-]
+    '104.192.143.0/24',
+    '131.103.20.160/27',
+    '165.254.145.0/26',
+])
 
+in_whitelist = partial(in_networks, whitelist)
 
 urls = ('/(.*)', 'handler')
 
@@ -43,7 +43,7 @@ class handler:
     def POST(self, project):
         get_changes = partial(path, ['push', 'changes'])
 
-        if in_networks(whitelist, web.ctx.ip):
+        if in_whitelist(web.ctx.ip):
             data = json.loads(web.data())
             query = parse_qs(web.ctx.query[1:])
             branch = query.get('branch', ['master'])[0]
